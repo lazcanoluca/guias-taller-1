@@ -1,12 +1,18 @@
-use std::collections::HashMap;
+use std::{
+    cmp::Reverse,
+    collections::HashMap,
+    fs::File,
+    io::{BufRead, BufReader},
+};
 
 fn main() {
-    let lines = vec!["La casa tiene una ventana.", "La ventana fue defenestrada."];
+    let input = File::open("./words.txt").expect("Failed to open file");
+    let reader = BufReader::new(input);
 
     let mut words = HashMap::new();
 
-    for line in lines {
-        for word in line.split_whitespace() {
+    for line in reader.lines() {
+        for word in line.expect("Failed to read line").split_whitespace() {
             let mut word = word.to_owned();
 
             word.retain(|c| c.is_alphabetic());
@@ -19,7 +25,7 @@ fn main() {
     }
 
     let mut a: Vec<_> = words.into_iter().collect();
-    a.sort_by(|(_, a), (_, b)| b.cmp(a));
+    a.sort_by_key(|(_, count)| Reverse(*count));
 
     for (word, count) in a {
         println!("{} -> {}", word, count);
